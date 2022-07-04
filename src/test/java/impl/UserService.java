@@ -1,4 +1,4 @@
-package com.impl;
+package impl;
 
 /**
  * @author zhangqingyang

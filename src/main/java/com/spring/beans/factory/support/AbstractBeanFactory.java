@@ -2,7 +2,6 @@ package com.spring.beans.factory.support;
 
 import com.spring.beans.factory.BeanFactory;
 import com.spring.beans.factory.config.BeanDefinition;
-import com.spring.exception.SpringException;
 
 /**
  * @author zhangqingyang
@@ -10,7 +9,7 @@ import com.spring.exception.SpringException;
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
     @Override
-    public Object getBean(String beanName) throws SpringException {
+    public Object getBean(String beanName){
         Object bean = getSingleton(beanName);
         if (bean != null) {
             return bean;
@@ -19,7 +18,19 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         return createBean(beanName, beanDefinition);
     }
 
+    @Override
+    public Object getBean(String beanName, Object... args) {
+        Object bean = getSingleton(beanName);
+        if (bean != null) {
+            return bean;
+        }
+        BeanDefinition beanDefinition = getBeanDefinition(beanName);
+        return createBean(beanName, beanDefinition, args);
+    }
+
     abstract BeanDefinition getBeanDefinition(String beanName);
 
     abstract Object createBean(String beanName, BeanDefinition beanDefinition);
+
+    abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object... args);
 }
