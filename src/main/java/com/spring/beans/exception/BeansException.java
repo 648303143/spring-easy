@@ -1,4 +1,4 @@
-package com.spring.exception;
+package com.spring.beans.exception;
 
 /**
  * @author zhangqingyang

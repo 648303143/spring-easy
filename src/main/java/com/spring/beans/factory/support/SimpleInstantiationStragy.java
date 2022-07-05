@@ -1,7 +1,7 @@
 package com.spring.beans.factory.support;
 
 import com.spring.beans.factory.config.BeanDefinition;
-import com.spring.exception.BeansException;
+import com.spring.beans.exception.BeansException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

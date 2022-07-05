@@ -1,11 +1,10 @@
 import bean.UserDAO;
 import bean.UserService;
-import com.spring.beans.factory.PropertyValue;
-import com.spring.beans.factory.PropertyValues;
+import com.spring.beans.PropertyValue;
+import com.spring.beans.PropertyValues;
 import com.spring.beans.factory.config.BeanDefinition;
 import com.spring.beans.factory.config.BeanReference;
 import com.spring.beans.factory.support.DefaultListableBeanFactory;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.junit.Test;
 
 import java.util.ArrayList;

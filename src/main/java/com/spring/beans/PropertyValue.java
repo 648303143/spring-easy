@@ -1,4 +1,4 @@
-package com.spring.beans.factory;
+package com.spring.beans;
 
 /**
  * @author zhangqingyang

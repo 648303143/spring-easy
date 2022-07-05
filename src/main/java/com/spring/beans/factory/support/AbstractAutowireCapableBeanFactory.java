@@ -1,14 +1,13 @@
 package com.spring.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.spring.beans.factory.PropertyValue;
-import com.spring.beans.factory.PropertyValues;
+import com.spring.beans.PropertyValue;
+import com.spring.beans.PropertyValues;
 import com.spring.beans.factory.config.BeanDefinition;
 import com.spring.beans.factory.config.BeanReference;
-import com.spring.exception.BeansException;
+import com.spring.beans.exception.BeansException;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
 
 /**
@@ -18,20 +17,6 @@ import java.util.List;
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory {
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStragy();
 
-    @Override
-    Object createBean(String beanName, BeanDefinition beanDefinition) {
-        Object bean = null;
-        try {
-            bean = beanDefinition.getBeanClass().newInstance();
-            applyPropertyValues(bean,beanName,beanDefinition);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new BeansException("[createBean error] beanName:" + beanName, e);
-        }
-
-        addSingleton(beanName, bean);
-        return bean;
-
-    }
 
     @Override
     Object createBean(String beanName, BeanDefinition beanDefinition, Object... args) {
@@ -60,7 +45,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 BeanUtil.setFieldValue(bean,name,value);
             }
         } catch (Exception e) {
-            throw new BeansException("[applyPropertyValues error] beanName:"+beanName);
+            throw new BeansException("[applyPropertyValues error] beanName:"+beanName,e);
         }
     }
 
@@ -74,7 +59,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 break;
             }
         }
-        return instantiationStrategy.instantiate(beanDefinition, beanName, constructorToUse, args);
+        return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);
     }
 
     public InstantiationStrategy getInstantiationStrategy() {

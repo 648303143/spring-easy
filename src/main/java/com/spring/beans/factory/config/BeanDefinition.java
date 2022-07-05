@@ -1,7 +1,6 @@
 package com.spring.beans.factory.config;
 
-import com.spring.beans.factory.PropertyValue;
-import com.spring.beans.factory.PropertyValues;
+import com.spring.beans.PropertyValues;
 
 /**
  * @author zhangqingyang

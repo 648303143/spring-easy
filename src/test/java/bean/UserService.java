@@ -8,11 +8,11 @@ import lombok.Data;
  */
 @Data
 public class UserService {
-    private String uid;
-    private UserDAO userDAO;
+    private String uId;
+    private UserDAO userDao;
 
     public void queryUserInfo(Long uid) {
-        System.out.println("queryUserName" + userDAO.queryUserName(uid));
+        System.out.println("queryUserName:" + userDao.queryUserName(uid));
     }
 
 }

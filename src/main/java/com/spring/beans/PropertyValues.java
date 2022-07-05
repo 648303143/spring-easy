@@ -1,4 +1,6 @@
-package com.spring.beans.factory;
+package com.spring.beans;
+
+import com.spring.beans.PropertyValue;
 
 import java.util.ArrayList;
 import java.util.List;
