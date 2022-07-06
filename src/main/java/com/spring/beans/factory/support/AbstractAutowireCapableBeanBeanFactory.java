@@ -4,8 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.spring.beans.PropertyValue;
 import com.spring.beans.PropertyValues;
-import com.spring.beans.factory.DisposableBean;
-import com.spring.beans.factory.InitializingBean;
+import com.spring.beans.factory.*;
 import com.spring.beans.factory.config.AutowireCapableBeanFactory;
 import com.spring.beans.factory.config.BeanDefinition;
 import com.spring.beans.factory.config.BeanPostProcessor;
@@ -49,6 +48,17 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
 
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof Aware) {
+            if (bean instanceof BeanFactoryAware) {
+                ((BeanFactoryAware) bean).setBeanFactory(this);
+            }
+            if (bean instanceof BeanClassLoaderAware) {
+                ((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());
+            }
+            if (bean instanceof BeanNameAware) {
+                ((BeanNameAware) bean).setBeanName(beanName);
+            }
+        }
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {
