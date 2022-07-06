@@ -1,7 +1,7 @@
 package com.spring.beans.factory.support;
 
 import com.spring.beans.exception.BeansException;
-import com.spring.beans.factory.ConfigrableListableBeanFactory;
+import com.spring.beans.factory.ConfigrableListableBeanBeanFactory;
 import com.spring.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author zhangqingyang
  * @date 2022-06-30-19:41
  */
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry, ConfigrableListableBeanFactory {
+public class DefaultListableBeanBeanFactory extends AbstractAutowireCapableBeanBeanFactory implements BeanDefinitionRegistry, ConfigrableListableBeanBeanFactory {
     private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
     @Override
@@ -21,6 +21,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
             throw new BeansException("No bean named '" + beanName + "' is defined");
         }
         return beanDefinition;
+    }
+
+    @Override
+    public void preInstantiateSingletons() throws BeansException {
+        beanDefinitionMap.keySet().forEach(this::getBean);
     }
 
     @Override

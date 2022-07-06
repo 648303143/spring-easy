@@ -10,9 +10,11 @@ import lombok.Data;
 public class UserService {
     private String uId;
     private UserDAO userDao;
+    private String location;
+    private String company;
 
-    public void queryUserInfo(Long uid) {
-        System.out.println("queryUserName:" + userDao.queryUserName(uid));
+    public String queryUserInfo(Long uid) {
+        return userDao.queryUserName(uid) + "location" + location + "company" + company;
     }
 
 }

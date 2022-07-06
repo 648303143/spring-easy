@@ -1,5 +1,6 @@
 package com.spring.beans.factory.support;
 
+import com.spring.beans.factory.config.BeanPostProcessor;
 import com.spring.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Map;
  * @author zhangqingyang
  * @date 2022-06-30-18:01
  */
-public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
+public abstract class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     private final Map<String, Object> singletonObjects = new HashMap<>();
 
     @Override
@@ -22,4 +23,5 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     }
 
 
+    public abstract void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

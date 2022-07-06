@@ -4,7 +4,7 @@ import com.spring.beans.PropertyValue;
 import com.spring.beans.PropertyValues;
 import com.spring.beans.factory.config.BeanDefinition;
 import com.spring.beans.factory.config.BeanReference;
-import com.spring.beans.factory.support.DefaultListableBeanFactory;
+import com.spring.beans.factory.support.DefaultListableBeanBeanFactory;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class TestDemo01 {
     @Test
     public void test01() {
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        DefaultListableBeanBeanFactory beanFactory = new DefaultListableBeanBeanFactory();
         BeanDefinition beanDefinition = new BeanDefinition(UserService.class);
         String beanName = "userService";
         beanFactory.registerBeanDefinition(beanName, beanDefinition);
@@ -29,7 +29,7 @@ public class TestDemo01 {
 
     @Test
     public void test02() {
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        DefaultListableBeanBeanFactory beanFactory = new DefaultListableBeanBeanFactory();
         BeanDefinition beanDefinition = new BeanDefinition(UserService.class);
         String beanName = "userService";
         beanFactory.registerBeanDefinition(beanName, beanDefinition);
@@ -42,7 +42,7 @@ public class TestDemo01 {
 
     @Test
     public void test03() {
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        DefaultListableBeanBeanFactory beanFactory = new DefaultListableBeanBeanFactory();
         beanFactory.registerBeanDefinition("userDAO", new BeanDefinition(UserDAO.class));
         PropertyValues propertyValues = new PropertyValues(new ArrayList<>());
         propertyValues.addPropertyValue(new PropertyValue("uid", 1001L));

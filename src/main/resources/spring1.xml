@@ -10,5 +10,9 @@
         <property name="company" value="腾讯"/>
     </bean>
 
+    <bean class="processor.MyBeanFactoryPostProcessor"/>
+    <bean class="processor.MyBeanPostProcessor"/>
+
+
 
 </beans>
