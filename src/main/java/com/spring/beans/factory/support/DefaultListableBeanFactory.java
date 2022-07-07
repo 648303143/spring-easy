@@ -1,7 +1,7 @@
 package com.spring.beans.factory.support;
 
 import com.spring.beans.exception.BeansException;
-import com.spring.beans.factory.ConfigrableListableBeanBeanFactory;
+import com.spring.beans.factory.ConfigurableListableBeanFactory;
 import com.spring.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author zhangqingyang
  * @date 2022-06-30-19:41
  */
-public class DefaultListableBeanBeanFactory extends AbstractAutowireCapableBeanBeanFactory implements BeanDefinitionRegistry, ConfigrableListableBeanBeanFactory {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
     private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
     @Override

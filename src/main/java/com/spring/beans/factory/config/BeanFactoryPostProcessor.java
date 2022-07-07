@@ -1,7 +1,7 @@
 package com.spring.beans.factory.config;
 
 import com.spring.beans.exception.BeansException;
-import com.spring.beans.factory.ConfigrableListableBeanBeanFactory;
+import com.spring.beans.factory.ConfigurableListableBeanFactory;
 
 /**
  * @author zhangqingyang
@@ -9,5 +9,5 @@ import com.spring.beans.factory.ConfigrableListableBeanBeanFactory;
  */
 public interface BeanFactoryPostProcessor {
 
-    void postProcessBeanFactory(ConfigrableListableBeanBeanFactory beanFactory) throws BeansException;
+    void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
 }

@@ -1,31 +1,31 @@
 package com.spring.context.support;
 
 import com.spring.beans.exception.BeansException;
-import com.spring.beans.factory.support.DefaultListableBeanBeanFactory;
+import com.spring.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * @author zhangqingyang
  * @date 2022-07-05-15:58
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext{
-    private DefaultListableBeanBeanFactory beanFactory;
+    private DefaultListableBeanFactory beanFactory;
 
     @Override
     protected void refreshBeanFactory() throws BeansException {
-        DefaultListableBeanBeanFactory beanFactory = createBeanFactory();
+        DefaultListableBeanFactory beanFactory = createBeanFactory();
         loadBeanDefinitions(beanFactory);
         this.beanFactory = beanFactory;
     }
 
     @Override
-    public DefaultListableBeanBeanFactory getBeanFactory() {
+    public DefaultListableBeanFactory getBeanFactory() {
         return beanFactory;
     }
 
-    protected abstract void loadBeanDefinitions(DefaultListableBeanBeanFactory beanFactory);
+    protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory);
 
 
-    private DefaultListableBeanBeanFactory createBeanFactory() {
-        return new DefaultListableBeanBeanFactory();
+    private DefaultListableBeanFactory createBeanFactory() {
+        return new DefaultListableBeanFactory();
     }
 }

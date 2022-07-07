@@ -1,6 +1,6 @@
 import bean.UserService;
 import cn.hutool.core.io.IoUtil;
-import com.spring.beans.factory.support.DefaultListableBeanBeanFactory;
+import com.spring.beans.factory.support.DefaultListableBeanFactory;
 import com.spring.beans.factory.xml.XmlBeanDefinitionReader;
 import com.spring.core.io.DefaultResourceLoader;
 import com.spring.core.io.Resource;
@@ -42,7 +42,7 @@ public class XmlResourceLoaderTest {
 
     @Test
     public void test_xml() {
-        DefaultListableBeanBeanFactory beanFactory = new DefaultListableBeanBeanFactory();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
 

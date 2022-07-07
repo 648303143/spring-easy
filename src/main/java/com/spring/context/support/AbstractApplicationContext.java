@@ -1,7 +1,7 @@
 package com.spring.context.support;
 
 import com.spring.beans.exception.BeansException;
-import com.spring.beans.factory.ConfigrableListableBeanBeanFactory;
+import com.spring.beans.factory.ConfigurableListableBeanFactory;
 import com.spring.beans.factory.config.BeanFactoryPostProcessor;
 import com.spring.beans.factory.config.BeanPostProcessor;
 import com.spring.context.ConfigurableApplicationContext;
@@ -19,7 +19,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     public void refresh() throws BeansException {
         refreshBeanFactory();
 
-        ConfigrableListableBeanBeanFactory beanFactory = getBeanFactory();
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
@@ -30,14 +30,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         beanFactory.preInstantiateSingletons();
     }
 
-    private void registerBeanPostProcessors(ConfigrableListableBeanBeanFactory beanFactory) {
+    private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeansOfType(BeanPostProcessor.class);
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
             beanFactory.addBeanPostProcessor(beanPostProcessor);
         }
     }
 
-    private void invokeBeanFactoryPostProcessors(ConfigrableListableBeanBeanFactory beanFactory) {
+    private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class);
         for (BeanFactoryPostProcessor beanFactoryPostProcessor : beanFactoryPostProcessorMap.values()) {
             beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
@@ -54,7 +54,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         getBeanFactory().destroySingletons();
     }
 
-    protected abstract ConfigrableListableBeanBeanFactory getBeanFactory();
+    protected abstract ConfigurableListableBeanFactory getBeanFactory();
 
     protected abstract void refreshBeanFactory();
 

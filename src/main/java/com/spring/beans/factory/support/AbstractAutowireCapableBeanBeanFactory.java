@@ -27,24 +27,30 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
         Object bean = null;
         try {
             bean = createInstance(beanName, beanDefinition, args);
-            applyPropertyValues(bean,beanName,beanDefinition);
-            bean = initializeBean(beanName,bean,beanDefinition);
+
+            applyPropertyValues(bean, beanName, beanDefinition);
+
+            bean = initializeBean(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("[createBean error] beanName:" + beanName, e);
         }
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
-        addSingleton(beanName, bean);
+        if (beanDefinition.isSingleton()) {
+            registerSingleton(beanName, bean);
+        }
         return bean;
     }
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (!beanDefinition.isSingleton()) {
+            return;
+        }
         if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
             registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
         }
 
     }
-
 
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -71,10 +77,10 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
         return wrappedBean;
     }
 
-     @Override
-     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException{
+    @Override
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;
-        for (BeanPostProcessor processor : getBeanPostProcessors()){
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
             Object current = processor.postProcessAfterInitialization(result, beanName);
             if (null == current) {
                 return result;
@@ -85,9 +91,9 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
     }
 
     @Override
-    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException{
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;
-        for (BeanPostProcessor processor : getBeanPostProcessors()){
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
             Object current = processor.postProcessBeforeInitialization(result, beanName);
             if (null == current) {
                 return result;
@@ -123,10 +129,10 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
                     BeanReference beanReference = (BeanReference) value;
                     value = getBean(beanReference.getBeanName());
                 }
-                BeanUtil.setFieldValue(bean,name,value);
+                BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (Exception e) {
-            throw new BeansException("[applyPropertyValues error] beanName:"+beanName,e);
+            throw new BeansException("[applyPropertyValues error] beanName:" + beanName, e);
         }
     }
 

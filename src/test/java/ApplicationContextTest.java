@@ -1,5 +1,5 @@
 import bean.UserService;
-import com.spring.beans.factory.support.DefaultListableBeanBeanFactory;
+import com.spring.beans.factory.support.DefaultListableBeanFactory;
 import com.spring.beans.factory.xml.XmlBeanDefinitionReader;
 import com.spring.context.support.ClassPathXmlApplicationContext;
 import org.junit.Test;
@@ -14,7 +14,7 @@ public class ApplicationContextTest {
 
     @Test
     public void test_PostProcessor(){
-        DefaultListableBeanBeanFactory beanFactory = new DefaultListableBeanBeanFactory();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
         XmlBeanDefinitionReader definitionReader = new XmlBeanDefinitionReader(beanFactory);
         definitionReader.loadBeanDefinitions("classpath:spring.xml");

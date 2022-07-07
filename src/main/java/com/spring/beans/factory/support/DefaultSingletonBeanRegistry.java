@@ -6,28 +6,31 @@ import com.spring.beans.factory.config.BeanPostProcessor;
 import com.spring.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangqingyang
  * @date 2022-06-30-18:01
  */
 public abstract class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
-    private final Map<String, Object> singletonObjects = new HashMap<>();
-    private final Map<String, DisposableBean> disposableBeans = new HashMap<>();
+    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
+    private final Map<String, DisposableBean> disposableBeans = new LinkedHashMap<>();
+    protected static final Object NULL_OBJECT = new Object();
 
     @Override
     public Object getSingleton(String beanName) {
         return singletonObjects.get(beanName);
     }
 
-    public void addSingleton(String beanName, Object singletonObject) {
+    @Override
+    public void registerSingleton(String beanName, Object singletonObject) {
         singletonObjects.put(beanName,singletonObject);
     }
 
 
-    public abstract void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
     public void registerDisposableBean(String beanName, DisposableBeanAdapter disposableBeanAdapter) {
         disposableBeans.put(beanName,disposableBeanAdapter);
