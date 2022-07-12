@@ -8,12 +8,10 @@ import com.spring.beans.factory.config.BeanDefinition;
 import com.spring.beans.factory.config.BeanReference;
 import com.spring.beans.factory.support.AbstractBeanDefinitionReader;
 import com.spring.beans.factory.support.BeanDefinitionRegistry;
+import com.spring.context.annotation.ClassPathBeanDefinitionScanner;
 import com.spring.core.io.Resource;
 import com.spring.core.io.ResourceLoader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +73,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             if (!(childNodes.item(i) instanceof Element)){
                 continue;
             }
+            if ("context:component-scan".equals(childNodes.item(i).getNodeName())){
+                Element componentScan = (Element) childNodes.item(i);
+                if (componentScan != null) {
+                    String scanPath = componentScan.getAttribute("base-package");
+                    if (StrUtil.isEmpty(scanPath)){
+                        throw new BeansException("The value of base-package attribute can not be empty or null");
+                    }
+                    scanPackage(scanPath);
+                }
+            }
             if (!"bean".equals(childNodes.item(i).getNodeName())) {
                 continue;
             }
@@ -125,5 +133,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
         }
 
+    }
+
+    private void scanPackage(String scanPath) {
+        String[] basePackages = StrUtil.splitToArray(scanPath, ',');
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(getRegistry());
+        scanner.doScan(basePackages);
     }
 }

@@ -1,7 +1,5 @@
 package com.spring.beans;
 
-import com.spring.beans.PropertyValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +17,20 @@ public class PropertyValues {
     public PropertyValues() {
     }
 
-    public boolean addPropertyValue(PropertyValue propertyValue) {
-        return propertyValueList.add(propertyValue);
+    public void addPropertyValue(PropertyValue propertyValue) {
+        propertyValueList.add(propertyValue);
     }
 
-    public List<PropertyValue> getPropertyValues() {
-        return propertyValueList;
+    public PropertyValue[] getPropertyValues() {
+        return this.propertyValueList.toArray(new PropertyValue[0]);
+    }
+
+    public PropertyValue getPropertyValue(String propertyName) {
+        for (PropertyValue pv : this.propertyValueList) {
+            if (pv.getName().equals(propertyName)) {
+                return pv;
+            }
+        }
+        return null;
     }
 }
