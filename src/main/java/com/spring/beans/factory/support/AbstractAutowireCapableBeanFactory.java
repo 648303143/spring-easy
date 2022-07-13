@@ -16,42 +16,102 @@ import java.lang.reflect.Method;
  * @author zhangqingyang
  * @date 2022-06-30-19:34
  */
-public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStragy();
 
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object... args) {
-        Object bean = null;
-        try {
-            bean = resolveBeforeInstantiation(beanName, beanDefinition);
-            if (bean != null) {
-                return bean;
-            }
-            bean = createInstance(beanName, beanDefinition, args);
-
-            applyPropertyValues(bean, beanName, beanDefinition);
-
-            bean = initializeBean(beanName, bean, beanDefinition);
-        } catch (Exception e) {
-            throw new BeansException("[createBean error] beanName:" + beanName, e);
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null) {
+            return bean;
         }
-        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
-        if (beanDefinition.isSingleton()) {
-            registerSingleton(beanName, bean);
-        }
-        return bean;
+        return doCreateBean(beanName, beanDefinition, args);
     }
 
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
-        Object bean = applyPostProcessBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
         if (bean != null) {
             bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
         }
         return bean;
     }
 
-    protected Object applyPostProcessBeforeInstantiation(Class beanClass, String beanName) {
+    protected Object doCreateBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
+        Object bean = null;
+        try {
+            bean = createBeanInstance(beanName, beanDefinition, args);
+
+            if (beanDefinition.isSingleton()) {
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
+            }
+
+            boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+            if (!continueWithPropertyPopulation) {
+                return bean;
+            }
+
+            applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
+
+            applyPropertyValues(bean, beanName, beanDefinition);
+
+            bean = initializeBean(beanName, bean, beanDefinition);
+
+        } catch (Exception e) {
+            throw new BeansException("Instantiation of bean failed", e);
+        }
+
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
+        Object exposedObject = bean;
+        if (beanDefinition.isSingleton()) {
+            exposedObject = getSingleton(beanName);
+            registerSingleton(beanName, exposedObject);
+        }
+        return exposedObject;
+    }
+
+    protected Object createBeanInstance(String beanName, BeanDefinition beanDefinition, Object[] args) {
+        Constructor constructorToUse = null;
+        Class beanClass = beanDefinition.getBeanClass();
+        Constructor[] constructors = beanClass.getDeclaredConstructors();
+        for (Constructor constructor : constructors) {
+            if (args != null && constructor.getParameterTypes().length == args.length) {
+                constructorToUse = constructor;
+                break;
+            }
+        }
+        return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);
+    }
+
+    protected Object getEarlyBeanReference(String beanName, BeanDefinition beanDefinition, Object bean) {
+        Object exposedObject = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                exposedObject = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(bean, beanName);
+                if (exposedObject == null) {
+                    return exposedObject;
+                }
+            }
+        }
+        return exposedObject;
+    }
+
+    private void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, beanName);
+                if (pvs != null) {
+                    for (PropertyValue propertyValue : pvs.getPropertyValues()) {
+                        beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
+                    }
+                }
+            }
+        }
+    }
+
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
                 Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
@@ -61,6 +121,20 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
             }
         }
         return null;
+    }
+
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithPropertyPopulation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor = (InstantiationAwareBeanPostProcessor) beanPostProcessor;
+                if (!instantiationAwareBeanPostProcessor.postProcessAfterInstantiation(bean, beanName)) {
+                    continueWithPropertyPopulation = false;
+                    break;
+                }
+            }
+        }
+        return continueWithPropertyPopulation;
     }
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -155,19 +229,6 @@ public abstract class AbstractAutowireCapableBeanBeanFactory extends AbstractBea
         } catch (Exception e) {
             throw new BeansException("[applyPropertyValues error] beanName:" + beanName, e);
         }
-    }
-
-    protected Object createInstance(String beanName, BeanDefinition beanDefinition, Object[] args) {
-        Constructor constructorToUse = null;
-        Class beanClass = beanDefinition.getBeanClass();
-        Constructor[] constructors = beanClass.getDeclaredConstructors();
-        for (Constructor constructor : constructors) {
-            if (args != null && constructor.getParameterTypes().length == args.length) {
-                constructorToUse = constructor;
-                break;
-            }
-        }
-        return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);
     }
 
     public InstantiationStrategy getInstantiationStrategy() {

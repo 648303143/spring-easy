@@ -1,4 +1,4 @@
-import bean2.IUserService;
+import bean3.IUserService;
 import com.spring.context.support.ClassPathXmlApplicationContext;
 import org.junit.Test;
 

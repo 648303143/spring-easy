@@ -3,6 +3,7 @@ package com.spring.aop.framework.autoproxy;
 import com.spring.aop.*;
 import com.spring.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import com.spring.aop.framework.ProxyFactory;
+import com.spring.beans.PropertyValues;
 import com.spring.beans.exception.BeansException;
 import com.spring.beans.factory.BeanFactory;
 import com.spring.beans.factory.BeanFactoryAware;
@@ -13,6 +14,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author zhangqingyang
@@ -22,6 +26,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     public DefaultListableBeanFactory beanFactory;
 
+    private final Set<Object> earlyProxyReferences = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -35,39 +40,59 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (!earlyProxyReferences.contains(beanName)) {
+            return wrapIfNecessary(bean, beanName);
+        }
+
         return bean;
     }
 
     @Override
     public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-        if (isInfrastructureClass(beanClass)) {
-            return null;
+        return null;
+    }
+
+    @Override
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+        return pvs;
+    }
+
+    @Override
+    public Object getEarlyBeanReference(Object bean, String beanName) {
+        earlyProxyReferences.add(beanName);
+        return wrapIfNecessary(bean, beanName);
+    }
+
+    protected Object wrapIfNecessary(Object bean, String beanName) {
+        if (isInfrastructureClass(bean.getClass())) {
+            return bean;
         }
+
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
 
         for (AspectJExpressionPointcutAdvisor advisor : advisors) {
             ClassFilter classFilter = advisor.getPointcut().getClassFilter();
-            if (!classFilter.matches(beanClass)){
+            if (!classFilter.matches(bean.getClass())) {
                 continue;
             }
 
             AdvisedSupport advisedSupport = new AdvisedSupport();
 
-            TargetSource targetSource = null;
-            try {
-                targetSource = new TargetSource(beanClass.getDeclaredConstructor().newInstance());
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
+            TargetSource targetSource = new TargetSource(bean);
             advisedSupport.setTargetSource(targetSource);
             advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
             advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
-            advisedSupport.setProxyTargetClass(false);
+            advisedSupport.setProxyTargetClass(true);
 
             return new ProxyFactory(advisedSupport).getProxy();
         }
 
-        return null;
+        return bean;
     }
 
     private boolean isInfrastructureClass(Class<?> beanClass) {

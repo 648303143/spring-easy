@@ -1,6 +1,7 @@
 package com.spring.beans.factory.config;
 
 import com.spring.beans.factory.HierarchicalBeanFactory;
+import com.spring.util.StringValueResolver;
 
 /**
  * @author zhangqingyang
@@ -14,4 +15,8 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
     void destroySingletons();
+
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    String resolveEmbeddedValue(String value);
 }
